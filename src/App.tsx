@@ -1,17 +1,14 @@
 
 import { TextField, Container, Box, AppBar, Toolbar } from "@mui/material"
 import Typography from '@mui/material/Typography';
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import Conditions from "./components/Conditions";
 import LoginButton from './components/LoginButton';
-// import useLogin from "./hooks/UseLogin";
 import useCase from "./hooks/UseCase";
 import { LoadingButton } from "@mui/lab";
 
 function App() {
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const [selectedCondition, setSelectedCondition] = useState<string>();
   const { caseList, currentCase, nextCase, useCaseLoading } = useCase({ selectedCondition, mayFetch: isLoggedIn });
 

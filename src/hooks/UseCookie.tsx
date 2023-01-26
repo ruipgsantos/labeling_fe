@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-export default function useCookie({ key, checkEvery, initValue }: { key?: string, checkEvery?: number, initValue?: T }
+export default function useCookie({ key, checkEvery, initValue }: { key?: string, checkEvery?: number, initValue?: any }
 ): [any, (val: any) => void] {
   const [cookieState, setCookieState] = useState<any>(initValue!);
 

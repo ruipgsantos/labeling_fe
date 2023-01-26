@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default function UseLogin() {
 
-    const [authCookie, setAuthCookie] = useCookie<string | undefined>({
+    const [authCookie, setAuthCookie] = useCookie({
         key: "connect.sid",
     });
 
