@@ -2,7 +2,12 @@ import axios from "axios";
 import { useState, useCallback, useEffect } from "react";
 import { Case } from "../models";
 
-export default function useCase() {
+type useCaseProps = {
+    selectedCondition: string | undefined,
+    mayFetch: boolean | undefined
+}
+
+export default function useCase({ selectedCondition, mayFetch }: useCaseProps) {
 
     const [currentCase, setCurrentCase] = useState<Partial<Case>>();
     const [caseIndex, setCaseIndex] = useState<number>(0);
@@ -12,7 +17,7 @@ export default function useCase() {
     const getCases = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${process.env.REACT_APP_SERVER_URL ?? ""}/case`)
+            const res = await axios.get(`${process.env.REACT_APP_SERVER_URL ?? ""}/case`);
             if (res.status === 200) {
                 setCaseList(res.data);
                 setCurrentCase(res.data[0]);
@@ -22,20 +27,13 @@ export default function useCase() {
         } finally {
             setLoading(false);
         }
-
     }, [])
 
     const saveCase = useCallback(async () => {
         try {
             setLoading(true);
             const res = await axios.put(`${process.env.REACT_APP_SERVER_URL ?? ""}/case`,
-                currentCase,
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json;charset=UTF-8",
-                    },
-                });
+                { ...currentCase, label: selectedCondition, labelled: true });
 
             return res.status;
         } catch (e) {
@@ -44,35 +42,38 @@ export default function useCase() {
             setLoading(false);
         }
 
-    }, [currentCase])
-
-    const addToCase = useCallback((caseInfo: Partial<Case>) => {
-        setCurrentCase(cc => {
-            return { ...cc, ...caseInfo };
-        });
-    }, []);
+    }, [currentCase, selectedCondition])
 
     const nextCase = useCallback(async () => {
+        let auxCaseList = [...caseList];
         setLoading(true);
         //first, save the current case
-        if (currentCase?.label)
-            await saveCase();
+        if (selectedCondition) {
+            const status = await saveCase();
+            if (status === 200) {
+                auxCaseList = auxCaseList.filter((c, i) => { return i !== caseIndex })
+            }
+        }
 
-        const nextI = caseIndex + 1 >= caseList.length ? 0 : caseIndex + 1;
+        const nextI = caseIndex + 1 >= auxCaseList.length ? 0 : caseIndex + 1;
         setCaseIndex(nextI);
-        setCurrentCase(caseList[nextI]);
+        setCurrentCase(auxCaseList[nextI]);
 
-    }, [caseIndex, caseList, currentCase?.label, saveCase]);
+        setCaseList(auxCaseList);
+
+    }, [caseIndex, caseList, saveCase, selectedCondition]);
 
     useEffect(() => {
-        getCases();
-    }, [])
+        mayFetch && getCases();
+    }, [getCases, mayFetch])
 
     //when current case is updated, remove loading
     useEffect(() => {
-        setLoading(false);
-    }, [currentCase])
+        if (caseList.length !== 0) {
+            setLoading(false);
+        }
+    }, [caseList.length, currentCase])
 
-    return { currentCase, addToCase, nextCase, useCaseLoading: loading }
+    return { caseList, currentCase, nextCase, useCaseLoading: loading }
 
 }

@@ -1,21 +1,23 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useCookie from "../hooks/UseCookie";
 import axios from "axios";
 
 export default function UseLogin() {
 
-    const [loggedIn, getIsLoggedIn, setIsLoggedIn] = useCookie<boolean>({
-        key: "loggedin",
+    const [authCookie, setAuthCookie] = useCookie<string | undefined>({
+        key: "connect.sid",
     });
+
+    const [authenticated, setAuthenticated] = useState<boolean>(false);
 
     const [loginError, setLoginError] = useState<string>();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const isLoggedIn = useCallback(() => {
-        return `${loggedIn}` === 'false' ? false : true;
-    }, [loggedIn])
+    useEffect(() => {
+        setAuthenticated(!!authCookie);
+    }, [authCookie])
 
-    const doLogin = useCallback(async () => {        
+    const doLogin = useCallback(async () => {
         setLoginError(undefined);
         try {
             setLoading(true);
@@ -25,26 +27,19 @@ export default function UseLogin() {
                     password: "thechronic"
                 },
                 {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json;charset=UTF-8",
-                    },
+                    withCredentials: true,
                 })
-
-            if (res.status === 200) {
-                setIsLoggedIn(true);
-            }
         } catch (e) {
             setLoginError("Could not login.");
             console.info(e);
         } finally {
             setLoading(false);
         }
-    }, [setIsLoggedIn])
+    }, [])
 
     const doLogout = useCallback(() => {
-        setIsLoggedIn(false);
-    }, [setIsLoggedIn])
+        setAuthCookie(undefined);
+    }, [setAuthCookie])
 
-    return { loading, isLoggedIn, loginError, doLogin, doLogout }
+    return { loading, isAuthd: authenticated, loginError, doLogin, doLogout }
 }

@@ -1,21 +1,25 @@
-import { Button } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import useLogin from "../hooks/UseLogin";
+import { useEffect } from "react";
+
 
 
 type LoginButtonProps = {
-    doLogin: () => void;
-    doLogout: () => void;
-    loading: boolean;
-    isLoggedIn: () => boolean;
+    onAction: (action: boolean | undefined) => void
 }
 
-export default function LoginButton({ props }: { props: LoginButtonProps }) {
+export default function LoginButton({ onAction }: LoginButtonProps) {
 
-    const { loading, isLoggedIn, doLogin, doLogout } = props;
+    const { loading, isAuthd, loginError, doLogin, doLogout } = useLogin();
+
+    useEffect(() => {
+        onAction(isAuthd);
+    }, [isAuthd, onAction])
+
     return <LoadingButton color="inherit" loading={loading} variant="outlined"
-        onClick={() => {
-            isLoggedIn() ? doLogout() : doLogin();
+        onClick={async () => {
+            isAuthd ? doLogout() : await doLogin();
         }}>
-        {isLoggedIn() ? `Logout` : `Login`}
+        {isAuthd ? `Logout` : `Login`}
     </LoadingButton>;
 }

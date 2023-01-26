@@ -1,29 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-export default function useCookie<T>({ key, checkEvery, initValue }: { key?: string, checkEvery?: number, initValue?: T }
-): [T, () => T, (val: T) => void] {
-  const [cookieState, setCookieState] = useState<T>(initValue!);
+export default function useCookie({ key, checkEvery, initValue }: { key?: string, checkEvery?: number, initValue?: T }
+): [any, (val: any) => void] {
+  const [cookieState, setCookieState] = useState<any>(initValue!);
 
-  const setVal = useCallback((val: T) => {
+  const setVal = useCallback((val: any) => {
     Cookies.set(key!, val as string, { expires: 1 });
-    setCookieState(() => val);
+    setCookieState(val);
   }, [key]);
-
-  const getVal = useCallback((): T => {
-    return cookieState as T;
-  }, [cookieState]);
 
   useEffect(() => {
     setInterval(() => {
-      setCookieState(Cookies.get(key ?? "") as T);
-    }, checkEvery);
+      const currCookie = Cookies.get(key ?? "");
+      setCookieState(currCookie);
+    }, checkEvery ?? 300000);
 
-    const currCookie = Cookies.get(key ?? "") as T;
+    const currCookie = Cookies.get(key ?? "");
     if (currCookie) {
       setCookieState(currCookie);
     }
   }, []);
 
-  return [cookieState, getVal, setVal];
+  return [cookieState, setVal];
 };

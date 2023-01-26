@@ -1,62 +1,68 @@
 
-import { TextField, Container, Button, Box, AppBar, Toolbar } from "@mui/material"
+import { TextField, Container, Box, AppBar, Toolbar } from "@mui/material"
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Conditions from "./components/Conditions";
 import LoginButton from './components/LoginButton';
-import useLogin from "./hooks/UseLogin";
-import axios from "axios";
+// import useLogin from "./hooks/UseLogin";
 import useCase from "./hooks/UseCase";
 import { LoadingButton } from "@mui/lab";
 
 function App() {
 
-  const { loading, isLoggedIn, loginError, doLogin, doLogout } = useLogin();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [selectedCondition, setSelectedCondition] = useState<string>();
+  const { caseList, currentCase, nextCase, useCaseLoading } = useCase({ selectedCondition, mayFetch: isLoggedIn });
 
-  const { currentCase, addToCase, nextCase, useCaseLoading } = useCase();
 
-  useEffect(() => {
-    console.log("current case changed:");
-    console.log(currentCase);
-  }, [currentCase])
+  const checkLogin = useCallback((loggedIn: boolean | undefined) => {
+    setIsLoggedIn(!!loggedIn);
+  }, [])
 
   return (
     <Container >
       <AppBar position='static'>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h6">Case Labbeling</Typography>
-          <LoginButton props={{ loading, isLoggedIn, doLogin, doLogout }} />
+          <LoginButton onAction={checkLogin} />
         </Toolbar>
       </AppBar>
 
-      {isLoggedIn() ? <Container>
-        <Box component="main"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            m: 1
-          }}
-        >
-          <Box sx={{ flexGrow: 2 }}>
-            <Typography variant='h6'> Please review this case:</Typography>
-            <TextField sx={{ width: 1 }}
-              multiline disabled value={currentCase?.text} />
-          </Box>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant='h6'> Select condition:</Typography>
-            <Conditions setSelectedCondition={setSelectedCondition} />
-          </Box>
-        </Box>
+      {isLoggedIn ? <Container>
+        {caseList.length > 0 ?
+          <Box>
+            <Box component="main"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                m: 1
+              }}
+            >
+              <Box sx={{ flexGrow: 2 }}>
+                <Typography variant='h6'>Please review this case:</Typography>
+                <TextField sx={{ width: 1 }}
+                  multiline disabled value={currentCase?.text} />
+              </Box>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant='h6'> Select condition:</Typography>
+                <Conditions setSelectedCondition={setSelectedCondition} />
+              </Box>
+            </Box>
 
-        <Box justifyContent="space-between">
-          <LoadingButton loading={useCaseLoading} variant="contained"
-            onClick={nextCase}>
-            Next Case
-          </LoadingButton>
-        </Box>
+            <Box justifyContent="space-between">
+              <LoadingButton loading={useCaseLoading} variant="contained"
+                onClick={() => {
+                  nextCase();
+                  setSelectedCondition(undefined);
+                }}>
+                Next Case
+              </LoadingButton>
+            </Box>
+          </Box> :
+          <Typography variant='h6'>You are done!!</Typography>}
       </Container>
-        : <Typography variant='h6'> Please Login</Typography>
+        : <Typography variant='h6'>Please Login</Typography>
       }
     </Container >
   );
