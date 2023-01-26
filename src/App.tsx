@@ -1,12 +1,25 @@
 
-import { Select, TextField, Container, Button, Box, AppBar, Toolbar } from "@mui/material"
+import { TextField, Container, Button, Box, AppBar, Toolbar } from "@mui/material"
 import Typography from '@mui/material/Typography';
+import { useEffect, useState } from "react";
+import Conditions from "./components/Conditions";
 import LoginButton from './components/LoginButton';
 import useLogin from "./hooks/UseLogin";
+import axios from "axios";
+import useCase from "./hooks/UseCase";
+import { LoadingButton } from "@mui/lab";
 
 function App() {
 
   const { loading, isLoggedIn, loginError, doLogin, doLogout } = useLogin();
+  const [selectedCondition, setSelectedCondition] = useState<string>();
+
+  const { currentCase, addToCase, nextCase, useCaseLoading } = useCase();
+
+  useEffect(() => {
+    console.log("current case changed:");
+    console.log(currentCase);
+  }, [currentCase])
 
   return (
     <Container >
@@ -21,22 +34,26 @@ function App() {
         <Box component="main"
           sx={{
             display: "flex",
+            flexDirection: "column",
             m: 1
           }}
         >
           <Box sx={{ flexGrow: 2 }}>
             <Typography variant='h6'> Please review this case:</Typography>
             <TextField sx={{ width: 1 }}
-              multiline disabled >Asdasdasdassda</TextField>
+              multiline disabled value={currentCase?.text} />
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant='h6'> Select condition:</Typography>
-            <Select sx={{ width: 1 }} multiple native></Select>
+            <Conditions setSelectedCondition={setSelectedCondition} />
           </Box>
         </Box>
 
         <Box justifyContent="space-between">
-          <Button variant="contained">Next Case</Button>
+          <LoadingButton loading={useCaseLoading} variant="contained"
+            onClick={nextCase}>
+            Next Case
+          </LoadingButton>
         </Box>
       </Container>
         : <Typography variant='h6'> Please Login</Typography>

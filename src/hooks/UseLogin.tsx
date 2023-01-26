@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import useCookie from "../hooks/UseCookie";
 import axios from "axios";
 
@@ -15,8 +15,7 @@ export default function UseLogin() {
         return `${loggedIn}` === 'false' ? false : true;
     }, [loggedIn])
 
-    const doLogin = useCallback(async () => {
-        console.log(`${process.env.REACT_APP_SERVER_URL ?? ""}/auth/login`)
+    const doLogin = useCallback(async () => {        
         setLoginError(undefined);
         try {
             setLoading(true);
