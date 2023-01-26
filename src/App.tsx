@@ -1,8 +1,8 @@
 
-import { TextField, Container, Box, AppBar, Toolbar } from "@mui/material"
+import { TextField, Container, Box, AppBar, Toolbar, CircularProgress } from "@mui/material"
 import Typography from '@mui/material/Typography';
 import { useState, useCallback } from "react";
-import Conditions from "./components/Conditions";
+import Conditions from "./components/ConditionsList";
 import LoginButton from './components/LoginButton';
 import useCase from "./hooks/UseCase";
 import { LoadingButton } from "@mui/lab";
@@ -38,8 +38,8 @@ function App() {
             >
               <Box sx={{ flexGrow: 2 }}>
                 <Typography variant='h6'>Please review this case:</Typography>
-                <TextField sx={{ width: 1 }}
-                  multiline disabled value={currentCase?.text} />
+                {useCaseLoading ? <CircularProgress /> : <TextField sx={{ width: 1 }}
+                  multiline disabled value={currentCase?.text} />}
               </Box>
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant='h6'> Select condition:</Typography>
