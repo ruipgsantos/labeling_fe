@@ -33,7 +33,8 @@ export default function useCase({ selectedCondition, mayFetch }: useCaseProps) {
         try {
             setLoading(true);
             const res = await axios.put(`${process.env.REACT_APP_SERVER_URL ?? ""}/case`,
-                { ...currentCase, label: selectedCondition, labelled: true });
+                { caseId: currentCase?._id, labelId: selectedCondition },
+                { withCredentials: true });
 
             return res.status;
         } catch (e) {

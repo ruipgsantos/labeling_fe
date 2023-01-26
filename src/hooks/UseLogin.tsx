@@ -29,6 +29,9 @@ export default function UseLogin() {
                 {
                     withCredentials: true,
                 })
+            if (res.status === 200) {
+                setAuthenticated(true);
+            }
         } catch (e) {
             setLoginError("Could not login.");
             console.info(e);
@@ -39,6 +42,7 @@ export default function UseLogin() {
 
     const doLogout = useCallback(() => {
         setAuthCookie(undefined);
+        setAuthenticated(false);
     }, [setAuthCookie])
 
     return { loading, isAuthd: authenticated, loginError, doLogin, doLogout }
