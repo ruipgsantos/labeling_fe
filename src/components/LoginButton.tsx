@@ -2,8 +2,6 @@ import { LoadingButton } from "@mui/lab";
 import useLogin from "../hooks/UseLogin";
 import { useEffect } from "react";
 
-
-
 type LoginButtonProps = {
     onAction: (action: boolean | undefined) => void
 }

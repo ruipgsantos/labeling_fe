@@ -56,14 +56,17 @@ export default function useCase({ selectedCondition, mayFetch }: useCaseProps) {
             }
         }
 
+        //calculate next index of case list
         const nextI = caseIndex + 1 >= auxCaseList.length ? 0 : caseIndex + 1;
         setCaseIndex(nextI);
         setCurrentCase(auxCaseList[nextI]);
 
+        //finally set state at the end, to avoid mutating it in the middle
         setCaseList(auxCaseList);
 
     }, [caseIndex, caseList, saveCase, selectedCondition]);
 
+    //when authorized to do so, it will fetch all cases
     useEffect(() => {
         mayFetch && getCases();
     }, [getCases, mayFetch])
