@@ -7,7 +7,9 @@ import LoginButton from './components/LoginButton';
 import useCase from "./hooks/UseCase";
 import { LoadingButton } from "@mui/lab";
 
+//NOTE: could use Reducer to manage actions like Login, NextCase, etc
 function App() {
+  //NOTE: LoginError property should be used to show any kind of login errors
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedCondition, setSelectedCondition] = useState<string>();
   const { caseList, currentCase, nextCase, useCaseLoading } = useCase({ selectedCondition, mayFetch: isLoggedIn });
