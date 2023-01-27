@@ -21,7 +21,7 @@ function App() {
     <Container >
       <AppBar position='static'>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h6">Case Labbeling</Typography>
+          <Typography variant="h6">Case Labelling</Typography>
           <LoginButton onAction={checkLogin} />
         </Toolbar>
       </AppBar>
